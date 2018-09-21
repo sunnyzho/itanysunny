@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		canvas{
+			border:1px solid black;
+			
+		}
+	</style>
+</head>
+<body>
+	<b>Item A:</b> <input type="text" item="A" value="180" name="item">
+	<br>
+	<br>
+	<b>Item B:</b> <input type="text" item="B" value="99" name="item">
+	<br>
+	<br>
+	<b>Item C:</b> <input type="text" item="C" value="126" name="item">
+	<br>
+	<br>
+	<b>Item D:</b> <input type="text" item="D" value="155" name="item">
+	<br>
+	<br>
+	<b>Item E:</b> <input type="text" item="E" value="105" name="item">
+	<br>
+	<br>
+	<b>Item F:</b> <input type="text" item="F" value="65" name="item">
+	<br>
+	<br>
+	<input type="submit" value="Chart" onclick="genLineChart()">
+	<hr>
+</body>
+</html>
+<canvas width="800" height="340"></canvas>
+<script>
+	let c = document.querySelector("canvas");
+		let ctx = c.getContext("2d");
+		
+		const WIDTH = c.width;
+		const HEIGHT = c.height;
+		const PADDING = 50;
+		const ARROW = 16;
+		const LINE_HEIGHT = 30;
+		const BAR_WIDTH = 30;
+		const BAR_OFFSET = 70;
+
+		ctx.textAlign="center";
+		ctx.textBaseline="middle";
+
+		items=document.querySelectorAll("input[name='item']")
+
+		//加载背景
+		bg = new Image();
+		bg.src = "bg.gif";
+
+		function genLineChart() {
+		// 清空画布
+		ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+		//背景图片
+		let pattern = ctx.createPattern(bg,"repeat");
+		ctx.fillStyle = pattern;
+		ctx.fillRect(0,0,WIDTH,HEIGHT);
+
+		//绘制外边框
+		ctx.beginPath();
+		ctx.lineWidth = 1;
+		
+		ctx.moveTo(PADDING, PADDING);
+		ctx.lineTo(PADDING, HEIGHT-PADDING);
+		ctx.lineTo(WIDTH-PADDING, HEIGHT-PADDING);
+		ctx.stroke();
+
+		//绘制Y轴箭头
+		ctx.fillStyle="black";
+		ctx.lineWidth = 1;
+		ctx.beginPath();
+		ctx.moveTo(PADDING, PADDING);
+		ctx.lineTo(PADDING-ARROW/2.5, PADDING+ARROW/2.5);
+		ctx.lineTo(PADDING+ARROW/2.5, PADDING+ARROW/2.5);
+		ctx.closePath();
+		ctx.fill();
+
+		//绘制X轴箭头
+		ctx.fillStyle="black";
+		ctx.lineWidth = 1;
+		ctx.beginPath();
+		ctx.moveTo(WIDTH-PADDING, HEIGHT-PADDING);
+		ctx.lineTo(WIDTH-PADDING-ARROW/2.5,HEIGHT-PADDING-ARROW/2.5);
+		ctx.lineTo(WIDTH-PADDING-ARROW/2.5, HEIGHT-PADDING+ARROW/2.5);
+		ctx.closePath();
+		ctx.fill();
+
+		// 绘制等高线
+		let lines =Math.floor(HEIGHT - PADDING * 2)/LINE_HEIGHT;
+		ctx.fillStyle="black";
+		ctx.lineWidth = 1;
+		for(let i=0;i<lines;i++){
+		ctx.beginPath();
+		ctx.moveTo(PADDING-0.5,HEIGHT-PADDING-i*LINE_HEIGHT-0.5);
+		ctx.lineTo(WIDTH-PADDING-0.5, HEIGHT-PADDING-i*LINE_HEIGHT-0.5);
+		ctx.stroke();
+		}
+
+		//绘制Y轴数值
+		ctx.font="16px Times New Roman";
+		for(let i=0;i<lines;i++){
+		ctx.fillText(i * LINE_HEIGHT, PADDING /2, HEIGHT - PADDING - i * LINE_HEIGHT);
+		}
+
+		// 绘制X轴数值
+		ctx.fillStyle="blue";
+		ctx.font="italic bold 14px Times New Roman";
+		items.forEach((course, index) => {
+			ctx.fillText(course.getAttribute("item"), PADDING + BAR_OFFSET + (BAR_WIDTH + BAR_OFFSET) * index + BAR_WIDTH / 2 - 0.5, HEIGHT - PADDING + 20);
+		});
+
+		//设置柱型阴影
+		ctx.shadowColor = "#c3c3c3";
+		ctx.shadowOffsetX = 10;
+		ctx.shadowOffsetY = -10;
+		ctx.shadowBlur = 20;
+
+		// 垂直线性
+		let gradient = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+		gradient.addColorStop(0, "rgba(0, 255, 0, 1)");
+		gradient.addColorStop(1, "rgba(255, 0, 0, 1)");
+
+
+		//绘制柱状图型
+		ctx.fillStyle= gradient;
+		items.forEach(({value}, index) => {
+			ctx.fillRect(PADDING + BAR_OFFSET + (BAR_WIDTH + BAR_OFFSET) * index - 0.5,HEIGHT - PADDING - value - 0.5, BAR_WIDTH , value - 0.5);
+		});
+
+		ctx.shadowColor = "rgba(0, 0, 0, 0)";
+
+		//绘制柱状图上数值
+		ctx.fillStyle="blue";
+		ctx.font="12px Times New Roman";
+		items.forEach(({value}, index) => {
+			ctx.fillText(value, PADDING + BAR_OFFSET + (BAR_WIDTH + BAR_OFFSET) * index + BAR_WIDTH / 2 - 0.5, HEIGHT - PADDING - value - 10 - 0.5);
+		});
+
+		//添加logo
+		let logo = new Image();
+		logo.src = "logo.png";
+		logo.onload = function(){
+			// ctx.drawImage(logo, 0, 0, logo.width, 32, 0, 0, logo.width * 0.5, 32 * 0.5);
+			ctx.drawImage(logo, WIDTH-logo.width, 0);
+			// ctx.drawImage(logo, WIDTH-logo.width, 0,logo.width, logo.height, 0, 0, logo.width * 0.5, logo.height * 0.5);
+			// ctx.drawImage(logo, 0, 0, logo.width, logo.height, 0, 0, logo.width * 0.5, logo.height * 0.5);
+		}
+
+
+	}
+		
+		
+</script>
